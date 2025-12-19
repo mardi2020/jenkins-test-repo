@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'docker:27'
-      args '-v /var/run/docker.sock:/var/run/docker.sock'
-    }
-  }
+  agent any
 
   environment {
     IMAGE = "aips-apps.kr.ncr.ntruss.com/test-app:latest"
@@ -26,14 +21,12 @@ pipeline {
           sleep 2
 
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:15000/health)
-
           if [ "$STATUS" != "200" ]; then
-            echo "❌ health check failed: status=$STATUS"
+            echo "health check failed: status=$STATUS"
             docker logs test-app-under-test || true
             exit 1
           fi
-
-          echo "✅ health check passed (200)"
+          echo "health check passed (200)"
         '''
       }
     }
